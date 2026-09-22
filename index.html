@@ -36,15 +36,48 @@
                 --shadow: 0 4px 15px rgba(34, 54, 102, 0.08);
             }
 
+/* Estructura en filas/columnas para el encabezado */
+.header-content-wrapper {
+                display: flex;
+                justify-content: space-between;
+                align-items: center; /* Alineación vertical perfecta */
+                gap: 20px;
+            }
+
+            .header-text {
+                flex: 1;
+            }
+
+.header-logo-container {
+                flex-shrink: 0;
+                background: #ffffff;
+                padding: 6px;
+                border-radius: 50%;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .form-logo {
+                height: 50px; /* Tamaño ligeramente optimizado */
+                width: 50px;
+                object-fit: contain;
+                display: block;
+            }
+
             * {
                 box-sizing: border-box;
                 margin: 0;
                 padding: 0;
             }
 
-            body {
+body {
                 font-family: "Montserrat", Arial, sans-serif;
-                background-color: var(--bg-color);
+                /* Fondo gris suave con un sutil patrón de puntos corporativos */
+                background-color: #f8fafc;
+                background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+                background-size: 24px 24px;
                 color: var(--text-main);
                 display: flex;
                 justify-content: center;
@@ -56,7 +89,7 @@
             .form-container {
                 background-color: var(--card-bg);
                 width: 100%;
-                max-width: 650px;
+                max-width: 850px;
                 border-radius: var(--radius);
                 box-shadow: var(--shadow);
                 overflow: hidden;
@@ -64,16 +97,16 @@
             }
 
             /* Cabezote dinámico SIES Salud */
-            .form-header {
+.form-header {
                 background: linear-gradient(135deg, var(--sies-azul-oscuro) 0%, var(--sies-azul-medio) 100%);
                 color: #ffffff;
-                padding: 28px 32px;
+                padding: 24px 28px; /* Padding interno más equilibrado */
                 text-align: left;
                 position: relative;
                 border-bottom: 4px solid var(--sies-verde-lima);
             }
 
-            .form-header-badge {
+.form-header-badge {
                 display: inline-block;
                 background-color: var(--sies-cyan);
                 color: #ffffff;
@@ -82,7 +115,7 @@
                 text-transform: uppercase;
                 padding: 4px 10px;
                 border-radius: 12px;
-                margin-bottom: 10px;
+                margin-bottom: 8px; /* Espacio inferior controlado */
                 letter-spacing: 0.5px;
             }
 
@@ -660,7 +693,7 @@
                 }
             }
 
-jQuery(document).ready(function ($) {
+            jQuery(document).ready(function ($) {
                 function matchCustom(params, data) {
                     if ($.trim(params.term) === "") {
                         return data;
@@ -708,14 +741,14 @@ jQuery(document).ready(function ($) {
                     matcher: matchCustom
                 });
 
-/* LÓGICA DE AUTOCOMPLETADO DE CATEGORÍA Y ASUNTO */
+                /* LÓGICA DE AUTOCOMPLETADO DE CATEGORÍA Y ASUNTO */
                 $("#CASECF15").on("change select2:select select2:clear", function () {
                     var selectedProblem = $(this).val();
                     var depValueStr = $("#dependent_field_values_Cases").val();
 
                     if (depValueStr && selectedProblem && selectedProblem !== "--Ninguna--") {
-                        // 1. Autocompletar Asunto con el problema seleccionado
-                        $("#subject").val(selectedProblem);
+                        // 1. Autocompletar Asunto con el problema seleccionado (Corregido a #Subject)
+                        $("#Subject").val(selectedProblem);
 
                         // 2. Autocompletar Categoría según el JSON de dependencias
                         try {
@@ -751,8 +784,8 @@ jQuery(document).ready(function ($) {
                             $("#Category").val("-").trigger("change.select2");
                         }
                     } else {
-                        // Si se limpia o selecciona "--Ninguna--", limpiamos ambos campos
-                        $("#subject").val("");
+                        // Si se limpia o selecciona "--Ninguna--", limpiamos ambos campos (Corregido a #Subject)
+                        $("#Subject").val("");
                         $("#Category").val("-").trigger("change.select2");
                     }
                 });
@@ -793,14 +826,21 @@ jQuery(document).ready(function ($) {
     </head>
     <body>
         <div class="form-container">
-            <!-- Cabezote SIES Salud -->
+<!-- Cabezote SIES Salud -->
             <div class="form-header">
-                <span class="form-header-badge">Soporte TI</span>
-                <h2>Mesa de Ayuda SIES Salud</h2>
-                <p>
-                    Protegemos la salud y garantizamos el correcto funcionamiento de tus plataformas. Registra tu
-                    incidente o solicitud técnica a continuación.
-                </p>
+                <div class="header-content-wrapper">
+                    <div class="header-text">
+                        <span class="form-header-badge">Soporte TI</span>
+                        <h2>Mesa de Ayuda SIES Salud</h2>
+                        <p>
+                            Protegemos la salud y garantizamos el correcto funcionamiento de tus plataformas. Registra tu
+                            incidente o solicitud técnica a continuación.
+                        </p>
+                    </div>
+                    <div class="header-logo-container">
+                        <img src="https://siessalud.com/wp-content/uploads/2022/08/logosies-300x300.png" alt="Logo SIES Salud" class="form-logo" />
+                    </div>
+                </div>
             </div>
 
             <form
@@ -1161,11 +1201,12 @@ jQuery(document).ready(function ($) {
                     </select>
                 </div>
 
+                <!-- Campo Asunto corregido con ID="Subject" en mayúscula -->
                 <div class="form-group" style="position: absolute; opacity: 0; pointer-events: none; height: 0; overflow: hidden;">
-                    <label for="subject">Asunto <span class="required">*</span></label>
+                    <label for="Subject">Asunto <span class="required">*</span></label>
                     <input
                         type="hidden"
-                        id="subject"
+                        id="Subject"
                         name="Subject"
                         value=""
                     />
