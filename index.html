@@ -708,7 +708,7 @@
                     matcher: matchCustom
                 });
 
-                /* LÓGICA DE AUTOCOMPLETADO DE CATEGORÍA Y ASUNTO */
+/* LÓGICA DE AUTOCOMPLETADO DE CATEGORÍA Y ASUNTO */
                 $("#CASECF15").on("change select2:select select2:clear", function () {
                     var selectedProblem = $(this).val();
                     var depValueStr = $("#dependent_field_values_Cases").val();
@@ -719,6 +719,28 @@
 
                         // 2. Disparar reglas de dependencia para los campos ocultos (Mesa de servicio, Subcategoría, etc.)
                         setDependent(this, false);
+
+                        // --- FORZAR VALORES EN CAMPOS DEPENDIENTES OCULTOS ---
+                        // Asegurar que si el campo se quedó sin selección automática, tome el primer valor disponible o uno por defecto
+                        if (!$("#CASECF1").val() || $("#CASECF1").val() === "") {
+                            $("#CASECF1").prop("selectedIndex", 0);
+                        }
+                        if (!$("#Sub Category").val() || $("#Sub Category").val() === "") {
+                            $("#Sub Category").prop("selectedIndex", 0);
+                        }
+                        if (!$("#CASECF6").val() || $("#CASECF6").val() === "") {
+                            $("#CASECF6").prop("selectedIndex", 0);
+                        }
+                        if (!$("#Classification").val() || $("#Classification").val() === "") {
+                            $("#Classification").prop("selectedIndex", 0);
+                        }
+
+                        // Disparar el cambio para que Zoho reconozca los valores seleccionados
+                        $("#CASECF1").trigger("change");
+                        $("#Sub Category").trigger("change");
+                        $("#CASECF6").trigger("change");
+                        $("#Classification").trigger("change");
+                        // -----------------------------------------------------
 
                         // 3. Autocompletar Categoría según el JSON de dependencias
                         try {
