@@ -746,10 +746,10 @@ $("#CASECF15").on("change select2:select select2:clear", function () {
     var depValueStr = $("#dependent_field_values_Cases").val();
 
     if (depValueStr && selectedProblem && selectedProblem !== "--Ninguna--") {
-        // 1. Autocompletar Asunto
+        // 1. Autocompletar Asunto oculto
         $("#Subject").val(selectedProblem);
 
-        // 2. Autocompletar Categoría visible
+        // 2. Autocompletar la Categoría visible automáticamente según el JSON de Zoho
         try {
             var depData = JSON.parse(depValueStr);
             if (depData && depData.JSON_VALUES) {
@@ -766,17 +766,16 @@ $("#CASECF15").on("change select2:select select2:clear", function () {
             console.error("Error al procesar el JSON de dependencias:", e);
         }
 
-        // 3. Disparar en cascada la función nativa de Zoho para los campos dependientes ocultos
+        // 3. Disparar la función nativa de Zoho para los campos ocultos (Mesa de Servicio, Subcategoría, Prioridad, etc.)
         setTimeout(function() {
             var problemObj = document.getElementById("CASECF15");
             if (problemObj) {
-                // Esto ejecuta el mapeo en cadena configurado en tu Zoho Desk (Problema -> Mesa, Subcategoría, Prioridad)
                 setDependent(problemObj, false);
             }
         }, 150);
 
     } else {
-        // Limpiar si no hay selección
+        // Limpiar y restablecer si no hay selección
         $("#Subject").val("");
         $("#Category").val("-").trigger("change.select2");
     }
@@ -1283,6 +1282,9 @@ $("#Sub Category").on("change", function() {
 <!-- CAMPOS OCULTOS REQUERIDOS POR ZOHO PARA LA MATRIZ DE DEPENDENCIAS -->
 <div style="display: none;">
     <!-- El campo de Categoría ya está visible como select, pero si hay dependencias internas, aseguramos los selectores -->
+    <select name="Mesa de Servicio" id="CASECF1">
+        <option value="" selected></option>
+    </select>
     <select name="Sub Category" id="Sub Category">
         <option value="-">-</option>
     </select>
