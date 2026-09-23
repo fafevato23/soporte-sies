@@ -840,7 +840,7 @@ $("#Sub Category").on("change", function() {
                 id="zsWebToCase_553872000013503219"
                 action="https://soporte.siessalud.com.co/support/WebToCase"
                 method="POST"
-                onSubmit="return zsValidateMandatoryFields()"
+                onsubmit="return handleFormSubmit(event)"
                 enctype="multipart/form-data"
                 class="form-body"
             >
@@ -1890,6 +1890,31 @@ $("#Sub Category").on("change", function() {
         </div>
 
         <script>
+            function handleFormSubmit(event) {
+    event.preventDefault(); // Evita el comportamiento tradicional que adjunta metadatos de navegación
+    
+    if (!zsValidateMandatoryFields()) {
+        return false;
+    }
+
+    const form = document.getElementById("zsWebToCase_553872000013503219");
+    const formData = new FormData(form);
+
+    // Envío silencioso mediante fetch para aislar la petición de las cabeceras del navegador
+    fetch(form.action, {
+        method: "POST",
+        body: formData,
+        mode: "no-cors" // Evita bloqueos de CORS con Zoho Desk
+    }).then(() => {
+        alert("¡Solicitud enviada con éxito!");
+        window.location.href = "https://soporte.siessalud.com.co/portal";
+    }).catch(error => {
+        console.error("Error al enviar el caso:", error);
+        form.submit(); // Plan de respaldo si falla el fetch
+    });
+
+    return false;
+}
             document.addEventListener('DOMContentLoaded', function() {
                 const fileInput = document.querySelector('.wtcuploadinput');
 
