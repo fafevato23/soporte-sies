@@ -2188,15 +2188,19 @@ $("#Sub Category").on("change", function() {
                 }
             });
         </script>
-<!-- SCRIPT ACTUALIZADO DE AUTOCOMPLETADO CON RUTA DE API COMPLETA -->
+<!-- SCRIPT CORREGIDO CON URL ABSOLUTA A ZOHO -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const checkUserInterval = setInterval(function () {
-        // Obtenemos el portalId actual de la URL si existe, o usamos la ruta completa de la API
-        const portalParam = window.location.search || "";
-        const apiUrl = "/portal/api/me" + portalParam;
+        // Apuntamos directamente al dominio real de Zoho Desk
+        // Si la página está en GitHub, aseguramos el portalId o usamos credentials include para enviar cookies de sesión si las hay
+        const portalParam = window.location.search || "?portalId=edbsn68b16d77c59943c066ec5cc659ebfb6e42d0d8bdc13aa85a1b6ff06d54ab5c04"; 
+        const apiUrl = "https://soporte.siessalud.com.co/portal/api/me" + portalParam;
 
-        fetch(apiUrl)
+        fetch(apiUrl, {
+            method: 'GET',
+            credentials: 'include' // Necesario para que el navegador comparta las cookies de sesión con Zoho
+        })
             .then(response => {
                 if (!response.ok) throw new Error("Error en la petición de sesión");
                 return response.json();
@@ -2244,12 +2248,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         lastNameInput.dispatchEvent(new Event('input', { bubbles: true }));
                     }
 
-                    // Si ya se rellenó con éxito, detenemos el intervalo
                     clearInterval(checkUserInterval);
                 }
             })
             .catch(err => {
-                // Sigue intentando cada segundo si aún no responde la sesión
+                // Sigue intentando si la sesión aún no responde
             });
     }, 1000);
 });
