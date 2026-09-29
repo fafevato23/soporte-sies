@@ -2188,74 +2188,72 @@ $("#Sub Category").on("change", function() {
                 }
             });
         </script>
-<!-- SCRIPT CORREGIDO CON URL ABSOLUTA A ZOHO -->
+<!-- SCRIPT INTERCEPTOR DE LA RESPUESTA DE ZOHO -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const checkUserInterval = setInterval(function () {
-        // Apuntamos directamente al dominio real de Zoho Desk
-        // Si la página está en GitHub, aseguramos el portalId o usamos credentials include para enviar cookies de sesión si las hay
-        const portalParam = window.location.search || "?portalId=edbsn68b16d77c59943c066ec5cc659ebfb6e42d0d8bdc13aa85a1b6ff06d54ab5c04"; 
-        const apiUrl = "https://soporte.siessalud.com.co/portal/api/me" + portalParam;
-
-        fetch(apiUrl, {
-            method: 'GET',
-            credentials: 'include' // Necesario para que el navegador comparta las cookies de sesión con Zoho
-        })
-            .then(response => {
-                if (!response.ok) throw new Error("Error en la petición de sesión");
-                return response.json();
-            })
-            .then(data => {
+(function() {
+    // Interceptamos el método window.fetch global de la página
+    const originalFetch = window.fetch;
+    window.fetch = async function(...args) {
+        const response = await originalFetch.apply(this, args);
+        
+        // Verificamos si la URL de la petición incluye "api/me" o el endpoint de perfil de Zoho
+        const url = args[0] || "";
+        if (typeof url === 'string' && url.includes('api/me')) {
+            // Clonamos la respuesta para poder leer su contenido sin alterar el funcionamiento de Zoho
+            response.clone().json().then(data => {
                 if (data && (data.emailId || data.fullName || data.displayName)) {
-                    // 1. Autocompletar Correo electrónico
-                    const emailInput = document.getElementById("email");
-                    if (emailInput && !emailInput.value) {
-                        emailInput.value = data.emailId || (data.email && data.email[0] && data.email[0].emailAddress) || "";
-                        emailInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-
-                    // Obtenemos el nombre completo
-                    const fullName = data.fullName || data.displayName || "";
-                    const nameParts = fullName.trim().split(" ");
-
-                    let firstNameVal = "";
-                    let lastNameVal = "";
-
-                    if (nameParts.length >= 4) {
-                        firstNameVal = nameParts[0] + " " + nameParts[1];
-                        lastNameVal = nameParts.slice(2).join(" ");
-                    } else if (nameParts.length === 3) {
-                        firstNameVal = nameParts[0];
-                        lastNameVal = nameParts.slice(1).join(" ");
-                    } else if (nameParts.length === 2) {
-                        firstNameVal = nameParts[0];
-                        lastNameVal = nameParts[1];
-                    } else {
-                        firstNameVal = fullName;
-                    }
-
-                    // 2. Autocompletar Nombres
-                    const firstNameInput = document.getElementById("first_name");
-                    if (firstNameInput && !firstNameInput.value) {
-                        firstNameInput.value = firstNameVal;
-                        firstNameInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-
-                    // 3. Autocompletar Apellidos
-                    const lastNameInput = document.getElementById("contact_name");
-                    if (lastNameInput && !lastNameInput.value) {
-                        lastNameInput.value = lastNameVal;
-                        lastNameInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-
-                    clearInterval(checkUserInterval);
+                    autocompletarCamposUsuario(data);
                 }
-            })
-            .catch(err => {
-                // Sigue intentando si la sesión aún no responde
-            });
-    }, 1000);
-});
+            }).catch(e => {});
+        }
+        
+        return response;
+    };
+
+    // Función para rellenar los inputs del formulario con los datos interceptados
+    function autocompletarCamposUsuario(data) {
+        // 1. Correo electrónico
+        const emailInput = document.getElementById("email");
+        if (emailInput && !emailInput.value) {
+            emailInput.value = data.emailId || (data.email && data.email[0] && data.email[0].emailAddress) || "";
+            emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        // 2. Procesar Nombres y Apellidos
+        const fullName = data.fullName || data.displayName || "";
+        const nameParts = fullName.trim().split(" ");
+
+        let firstNameVal = "";
+        let lastNameVal = "";
+
+        if (nameParts.length >= 4) {
+            firstNameVal = nameParts[0] + " " + nameParts[1];
+            lastNameVal = nameParts.slice(2).join(" ");
+        } else if (nameParts.length === 3) {
+            firstNameVal = nameParts[0];
+            lastNameVal = nameParts.slice(1).join(" ");
+        } else if (nameParts.length === 2) {
+            firstNameVal = nameParts[0];
+            lastNameVal = nameParts[1];
+        } else {
+            firstNameVal = fullName;
+        }
+
+        // Nombres
+        const firstNameInput = document.getElementById("first_name");
+        if (firstNameInput && !firstNameInput.value) {
+            firstNameInput.value = firstNameVal;
+            firstNameInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        // Apellidos
+        const lastNameInput = document.getElementById("contact_name");
+        if (lastNameInput && !lastNameInput.value) {
+            lastNameInput.value = lastNameVal;
+            lastNameInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+})();
 </script>
     </body>
 </html>
