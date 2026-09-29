@@ -2188,5 +2188,56 @@ $("#Sub Category").on("change", function() {
                 }
             });
         </script>
+        <!-- SCRIPT ACTUALIZADO DE AUTOCOMPLETADO DE USUARIO Y APELLIDOS -->
+ <script>
+ document.addEventListener("DOMContentLoaded", function () {
+ fetch('me')
+ .then(response => response.json())
+ .then(data => {
+ if (data) {
+ // 1. Autocompletar Correo electrónico
+ const emailInput = document.getElementById("email");
+ if (emailInput && !emailInput.value) {
+ emailInput.value = data.emailId || (data.email && data.email[0] && data.email[0].emailAddress) || "";
+ }
+
+ // Obtenemos el nombre completo corporativo (ej: "Faiber Fernando Valenzuela Torres")
+ const fullName = data.fullName || data.displayName || "";
+ const nameParts = fullName.trim().split(" ");
+
+ let firstNameVal = "";
+ let lastNameVal = "";
+
+ if (nameParts.length >= 4) {
+ // Si tiene 4 o más palabras (ej: Nombre1 Nombre2 Apellido1 Apellido2)
+ firstNameVal = nameParts[0] + " " + nameParts[1];
+ lastNameVal = nameParts.slice(2).join(" ");
+ } else if (nameParts.length === 3) {
+ // Si tiene 3 palabras (ej: Nombre1 Nombre2 Apellido1)
+ firstNameVal = nameParts[0];
+ lastNameVal = nameParts.slice(1).join(" ");
+ } else if (nameParts.length === 2) {
+ // Si tiene 2 palabras (ej: Nombre1 Apellido1)
+ firstNameVal = nameParts[0];
+ lastNameVal = nameParts[1];
+ } else {
+ firstNameVal = fullName;
+ }
+
+ // 2. Autocompletar Nombres
+ const firstNameInput = document.getElementById("first_name");
+ if (firstNameInput && !firstNameInput.value) {
+ firstNameInput.value = firstNameVal;
+ }
+
+ // 3. Autocompletar Apellidos
+ const lastNameInput = document.getElementById("contact_name");
+ if (lastNameInput && !lastNameInput.value) {
+ lastNameInput.value = lastNameVal;
+ }
+ }
+ }).catch(err => console.log("Sesión no disponible", err));
+ });
+ </script>
     </body>
 </html>
