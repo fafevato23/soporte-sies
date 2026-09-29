@@ -2188,56 +2188,71 @@ $("#Sub Category").on("change", function() {
                 }
             });
         </script>
-        <!-- SCRIPT ACTUALIZADO DE AUTOCOMPLETADO DE USUARIO Y APELLIDOS -->
- <script>
- document.addEventListener("DOMContentLoaded", function () {
- fetch('me')
- .then(response => response.json())
- .then(data => {
- if (data) {
- // 1. Autocompletar Correo electrónico
- const emailInput = document.getElementById("email");
- if (emailInput && !emailInput.value) {
- emailInput.value = data.emailId || (data.email && data.email[0] && data.email[0].emailAddress) || "";
- }
+<!-- SCRIPT ACTUALIZADO DE AUTOCOMPLETADO CON RUTA DE API COMPLETA -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const checkUserInterval = setInterval(function () {
+        // Obtenemos el portalId actual de la URL si existe, o usamos la ruta completa de la API
+        const portalParam = window.location.search || "";
+        const apiUrl = "/portal/api/me" + portalParam;
 
- // Obtenemos el nombre completo corporativo (ej: "Faiber Fernando Valenzuela Torres")
- const fullName = data.fullName || data.displayName || "";
- const nameParts = fullName.trim().split(" ");
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) throw new Error("Error en la petición de sesión");
+                return response.json();
+            })
+            .then(data => {
+                if (data && (data.emailId || data.fullName || data.displayName)) {
+                    // 1. Autocompletar Correo electrónico
+                    const emailInput = document.getElementById("email");
+                    if (emailInput && !emailInput.value) {
+                        emailInput.value = data.emailId || (data.email && data.email[0] && data.email[0].emailAddress) || "";
+                        emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
 
- let firstNameVal = "";
- let lastNameVal = "";
+                    // Obtenemos el nombre completo
+                    const fullName = data.fullName || data.displayName || "";
+                    const nameParts = fullName.trim().split(" ");
 
- if (nameParts.length >= 4) {
- // Si tiene 4 o más palabras (ej: Nombre1 Nombre2 Apellido1 Apellido2)
- firstNameVal = nameParts[0] + " " + nameParts[1];
- lastNameVal = nameParts.slice(2).join(" ");
- } else if (nameParts.length === 3) {
- // Si tiene 3 palabras (ej: Nombre1 Nombre2 Apellido1)
- firstNameVal = nameParts[0];
- lastNameVal = nameParts.slice(1).join(" ");
- } else if (nameParts.length === 2) {
- // Si tiene 2 palabras (ej: Nombre1 Apellido1)
- firstNameVal = nameParts[0];
- lastNameVal = nameParts[1];
- } else {
- firstNameVal = fullName;
- }
+                    let firstNameVal = "";
+                    let lastNameVal = "";
 
- // 2. Autocompletar Nombres
- const firstNameInput = document.getElementById("first_name");
- if (firstNameInput && !firstNameInput.value) {
- firstNameInput.value = firstNameVal;
- }
+                    if (nameParts.length >= 4) {
+                        firstNameVal = nameParts[0] + " " + nameParts[1];
+                        lastNameVal = nameParts.slice(2).join(" ");
+                    } else if (nameParts.length === 3) {
+                        firstNameVal = nameParts[0];
+                        lastNameVal = nameParts.slice(1).join(" ");
+                    } else if (nameParts.length === 2) {
+                        firstNameVal = nameParts[0];
+                        lastNameVal = nameParts[1];
+                    } else {
+                        firstNameVal = fullName;
+                    }
 
- // 3. Autocompletar Apellidos
- const lastNameInput = document.getElementById("contact_name");
- if (lastNameInput && !lastNameInput.value) {
- lastNameInput.value = lastNameVal;
- }
- }
- }).catch(err => console.log("Sesión no disponible", err));
- });
- </script>
+                    // 2. Autocompletar Nombres
+                    const firstNameInput = document.getElementById("first_name");
+                    if (firstNameInput && !firstNameInput.value) {
+                        firstNameInput.value = firstNameVal;
+                        firstNameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+
+                    // 3. Autocompletar Apellidos
+                    const lastNameInput = document.getElementById("contact_name");
+                    if (lastNameInput && !lastNameInput.value) {
+                        lastNameInput.value = lastNameVal;
+                        lastNameInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+
+                    // Si ya se rellenó con éxito, detenemos el intervalo
+                    clearInterval(checkUserInterval);
+                }
+            })
+            .catch(err => {
+                // Sigue intentando cada segundo si aún no responde la sesión
+            });
+    }, 1000);
+});
+</script>
     </body>
 </html>
