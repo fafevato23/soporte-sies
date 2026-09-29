@@ -2191,12 +2191,11 @@ $("#Sub Category").on("change", function() {
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
-    
     const emailParam = urlParams.get('email');
     const nameParam = urlParams.get('name');
 
-    // 1. Autocompletar el Correo electrónico
-    if (emailParam) {
+    // Validamos que el parámetro exista y NO sea la etiqueta sin procesar de Zoho
+    if (emailParam && !emailParam.includes("${")) {
         const emailInput = document.getElementById("email");
         if (emailInput && !emailInput.value) {
             emailInput.value = emailParam;
@@ -2204,8 +2203,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 2. Procesar y separar Nombres y Apellidos
-    if (nameParam) {
+    if (nameParam && !nameParam.includes("${")) {
         const decodedName = decodeURIComponent(nameParam);
         const nameParts = decodedName.trim().split(" ");
 
@@ -2213,29 +2211,24 @@ document.addEventListener("DOMContentLoaded", function () {
         let lastNameVal = "";
 
         if (nameParts.length >= 4) {
-            // Ejemplo: Faiber Fernando Valenzuela Torres -> Nombres: "Faiber Fernando", Apellidos: "Valenzuela Torres"
             firstNameVal = nameParts[0] + " " + nameParts[1];
             lastNameVal = nameParts.slice(2).join(" ");
         } else if (nameParts.length === 3) {
-            // Ejemplo: Faiber Valenzuela Torres -> Nombres: "Faiber", Apellidos: "Valenzuela Torres"
             firstNameVal = nameParts[0];
             lastNameVal = nameParts.slice(1).join(" ");
         } else if (nameParts.length === 2) {
-            // Ejemplo: Faiber Valenzuela -> Nombres: "Faiber", Apellidos: "Valenzuela"
             firstNameVal = nameParts[0];
             lastNameVal = nameParts[1];
         } else {
             firstNameVal = decodedName;
         }
 
-        // Asignar al input de Nombres
         const firstNameInput = document.getElementById("first_name");
         if (firstNameInput && !firstNameInput.value) {
             firstNameInput.value = firstNameVal;
             firstNameInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
-        // Asignar al input de Apellidos
         const lastNameInput = document.getElementById("contact_name");
         if (lastNameInput && !lastNameInput.value) {
             lastNameInput.value = lastNameVal;
