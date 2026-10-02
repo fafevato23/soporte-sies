@@ -51,17 +51,17 @@
 .header-logo-container {
                 flex-shrink: 0;
                 background: #ffffff;
-                padding: 6px;
+                padding: 10px;
                 border-radius: 50%;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
                 display: flex;
                 align-items: center;
                 justify-content: center;
             }
 
             .form-logo {
-                height: 50px; /* Tamaño ligeramente optimizado */
-                width: 50px;
+                height: 85px; /* Tamaño ligeramente optimizado */
+                width: 85px;
                 object-fit: contain;
                 display: block;
             }
@@ -73,19 +73,18 @@
             }
 
 body {
-                font-family: "Montserrat", Arial, sans-serif;
-                /* Fondo gris suave con un sutil patrón de puntos corporativos */
-                background-color: #f8fafc;
-                background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-                background-size: 24px 24px;
-                color: var(--text-main);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                padding: 20px;
-            }
-
+    font-family: "Montserrat", Arial, sans-serif;
+    /* Fondo con el color azul oscuro oficial de la paleta de SIES Salud */
+    background-color: var(--sies-azul-oscuro);
+    background-image: radial-gradient(rgba(0, 171, 200, 0.15) 1.5px, transparent 1.5px);
+    background-size: 28px 28px;
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
             .form-container {
                 background-color: var(--card-bg);
                 width: 100%;
@@ -98,13 +97,13 @@ body {
 
             /* Cabezote dinámico SIES Salud */
 .form-header {
-                background: linear-gradient(135deg, var(--sies-azul-oscuro) 0%, var(--sies-azul-medio) 100%);
-                color: #ffffff;
-                padding: 24px 28px; /* Padding interno más equilibrado */
-                text-align: left;
-                position: relative;
-                border-bottom: 4px solid var(--sies-verde-lima);
-            }
+    background-color: var(--sies-azul-oscuro); /* Fondo azul sólido solo en la cabecera dentro de la tarjeta */
+    color: #ffffff;
+    padding: 30px 28px 20px 28px;
+    text-align: left;
+    position: relative;
+    border-bottom: 4px solid var(--sies-verde-lima); /* Línea verde lima institucional */
+}
 
 .form-header-badge {
                 display: inline-block;
@@ -120,10 +119,10 @@ body {
             }
 
             .form-header h2 {
-                font-size: 22px;
+                font-size: 28px;
                 font-weight: 700;
                 margin-bottom: 6px;
-                letter-spacing: 0.2px;
+                letter-spacing: 0.3px;
             }
 
             .form-header p {
@@ -822,11 +821,10 @@ $("#Sub Category").on("change", function() {
             <div class="form-header">
                 <div class="header-content-wrapper">
                     <div class="header-text">
-                        <span class="form-header-badge">Soporte TI</span>
-                        <h2>Mesa de Ayuda SIES Salud</h2>
-                        <p>
-                            Protegemos la salud y garantizamos el correcto funcionamiento de tus plataformas. Registra tu
-                            incidente o solicitud técnica a continuación.
+                        <h2>Mesa de Ayuda TI Sies Salud</h2>
+                        <p class="header-description">
+                            Protegemos la salud y garantizamos el correcto funcionamiento de tus plataformas. <br>
+                            Registra tu incidente o solicitud técnica a continuación.
                         </p>
                     </div>
                     <div class="header-logo-container">
@@ -2190,15 +2188,33 @@ $("#Sub Category").on("change", function() {
         </script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+    const emailInput = document.getElementById("email");
+    const firstNameInput = document.getElementById("first_name");
+    const lastNameInput = document.getElementById("contact_name");
+
+    // 1. CARGAR DATOS AL ABRIR LA PÁGINA
+    if (emailInput && localStorage.getItem("sies_user_email")) {
+        emailInput.value = localStorage.getItem("sies_user_email");
+        emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    if (firstNameInput && localStorage.getItem("sies_user_firstname")) {
+        firstNameInput.value = localStorage.getItem("sies_user_firstname");
+        firstNameInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    if (lastNameInput && localStorage.getItem("sies_user_lastname")) {
+        lastNameInput.value = localStorage.getItem("sies_user_lastname");
+        lastNameInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    // 2. LEER PARÁMETROS DE LA URL (SI EXISTEN)
     const urlParams = new URLSearchParams(window.location.search);
     const emailParam = urlParams.get('email');
     const nameParam = urlParams.get('name');
 
-    // Validamos que el parámetro exista y NO sea la etiqueta sin procesar de Zoho
     if (emailParam && !emailParam.includes("${")) {
-        const emailInput = document.getElementById("email");
-        if (emailInput && !emailInput.value) {
+        if (emailInput) {
             emailInput.value = emailParam;
+            localStorage.setItem("sies_user_email", emailParam);
             emailInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
     }
@@ -2223,17 +2239,34 @@ document.addEventListener("DOMContentLoaded", function () {
             firstNameVal = decodedName;
         }
 
-        const firstNameInput = document.getElementById("first_name");
-        if (firstNameInput && !firstNameInput.value) {
+        if (firstNameInput) {
             firstNameInput.value = firstNameVal;
+            localStorage.setItem("sies_user_firstname", firstNameVal);
             firstNameInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
-        const lastNameInput = document.getElementById("contact_name");
-        if (lastNameInput && !lastNameInput.value) {
+        if (lastNameInput) {
             lastNameInput.value = lastNameVal;
+            localStorage.setItem("sies_user_lastname", lastNameVal);
             lastNameInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
+    }
+
+    // 3. GUARDAR EN TIEMPO REAL (A medida que el usuario escribe)
+    if (emailInput) {
+        emailInput.addEventListener("input", function() {
+            localStorage.setItem("sies_user_email", emailInput.value);
+        });
+    }
+    if (firstNameInput) {
+        firstNameInput.addEventListener("input", function() {
+            localStorage.setItem("sies_user_firstname", firstNameInput.value);
+        });
+    }
+    if (lastNameInput) {
+        lastNameInput.addEventListener("input", function() {
+            localStorage.setItem("sies_user_lastname", lastNameInput.value);
+        });
     }
 });
 </script>
